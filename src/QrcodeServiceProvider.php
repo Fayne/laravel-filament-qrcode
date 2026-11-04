@@ -21,9 +21,7 @@ class QrcodeServiceProvider extends PackageServiceProvider
     {
         $package->name('qrcode')
             ->hasConfigFile()
-            ->hasCommand(\Fayne\QrCode\Console\InstallCommand::class)
-            ->hasMigrations('2026_09_16_000000_create_qrcodes_table')
-            ->runsMigrations();
+            ->hasCommand(\Fayne\QrCode\Console\InstallCommand::class);
     }
 
     public function packageRegistered(): void
@@ -42,6 +40,8 @@ class QrcodeServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->publishes([__DIR__ . '/../database/migrations' => database_path('migrations')], 'qrcode-migrations');
         $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'filament-qrcode');
         if (! $this->app->bound('easywechat.mini_app.default')) {
             $this->app->singleton('easywechat.mini_app.default', function ($app) {

@@ -19,6 +19,11 @@ final class InstallCommand extends Command
             return self::FAILURE;
         }
 
+        $status = $this->call('vendor:publish', ['--tag' => 'qrcode-migrations', '--no-interaction' => true]);
+        if ($status !== self::SUCCESS) {
+            return $status;
+        }
+
         $status = $this->call('migrate', ['--force' => true]);
         if ($status !== self::SUCCESS) {
             return $status;
