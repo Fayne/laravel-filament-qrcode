@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'singular' => '二维码',
+    'plural' => '二维码',
+    'internal_name' => '内部名称',
+    'type' => '二维码类型',
+    'scene' => '场景参数',
+    'path' => '小程序页面路径',
+    'target_url' => '目标网址',
+    'additional_data' => '附加数据',
+    'expired_at' => '过期时间',
+    'created_at' => '创建时间',
+    'width' => '尺寸（像素）',
+    'auto_color' => '自动配色',
+    'line_color' => '线条颜色',
+    'is_hyaline' => '透明背景',
+    'disk' => '存储磁盘',
+    'storage_path' => '存储目录',
+    'check_path' => '检查小程序页面',
+    'key' => '键名',
+    'value' => '值',
+    'expiry_help' => '过期时间仅作记录，不会使已生成的二维码自动失效。',
+    'generate_web' => '生成网页二维码',
+    'generate_mini_app' => '生成小程序码',
+    'wechat_mini_app' => '微信小程序',
+    'web_url' => '网页网址',
+];

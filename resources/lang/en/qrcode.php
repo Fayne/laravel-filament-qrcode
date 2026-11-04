@@ -1,0 +1,28 @@
+<?php
+
+return [
+    'singular' => 'QR code',
+    'plural' => 'QR codes',
+    'internal_name' => 'Internal name',
+    'type' => 'Type',
+    'scene' => 'Scene',
+    'path' => 'Mini App page',
+    'target_url' => 'Target URL',
+    'additional_data' => 'Additional data',
+    'expired_at' => 'Expires at',
+    'created_at' => 'Created at',
+    'width' => 'Width (pixels)',
+    'auto_color' => 'Automatic color',
+    'line_color' => 'Line color',
+    'is_hyaline' => 'Transparent background',
+    'disk' => 'Storage disk',
+    'storage_path' => 'Storage directory',
+    'check_path' => 'Check Mini App page',
+    'key' => 'Key',
+    'value' => 'Value',
+    'expiry_help' => 'Expiration is metadata; it does not disable an already generated QR code.',
+    'generate_web' => 'Generate web QR code',
+    'generate_mini_app' => 'Generate Mini App QR code',
+    'wechat_mini_app' => 'WeChat Mini App',
+    'web_url' => 'Web URL',
+];
