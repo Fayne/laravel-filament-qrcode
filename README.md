@@ -140,3 +140,16 @@ $result = $product->generateQrcode(
 `php artisan cms:qrcode:install` 执行所有已注册迁移，只在配置文件不存在时发布 `qrcode.php`，并在权限表可用时初始化本包声明的权限定义（CMS Core 使用 tenant 前缀，独立权限宿主使用原有名称）。可重复执行，不覆盖配置或已有角色授权。安装不会生成图片、演示数据、微信凭证或自动注册 Panel。
 
 生产部署使用 `php artisan cms:qrcode:install --force --no-interaction`。迁移或配置发布失败立即停止；权限表不存在时提示宿主先完成授权接入。此命令不调用 `cms:install`，避免模块安装互相递归。配置缓存存在时按部署流程刷新，随后显式配置磁盘、微信凭证和管理员授权。
+
+
+When orchestrated by `cms:install`, installed modules publish their configuration and migrations before the first migration pass. The shared installer then migrates and seeds permissions once, creates accounts/tenants, and generates demo content. Nested module commands reuse the prepared infrastructure instead of publishing or migrating again. Running a module install command independently still performs its complete setup. Preparation state is confined to the command run and restored on success or failure.
+
+## 已安装模块自动接入
+
+与 CMS Core 配合使用时，本包的 ServiceProvider 自动登记模块，无需在宿主逐个维护业务插件清单。继承 `Fayne\CMS\Providers\AdminPanelProvider` / `TenantPanelProvider` 的后台自动接入：单租户使用普通后台，多租户业务界面进入 workspace。安装模块不会自动授予账号权限，导航仍遵循 Policy。
+
+已有完全自定义的 PanelProvider 可在配置完显式插件后，将最终返回改为 `return app(\Fayne\CMS\Support\Modules\ModuleRegistry::class)->applyTo($panel);`。同 ID 的显式插件会保留；不要在此调用之后再次注册同一个业务插件。本文原有手动 Plugin 示例仍可用于独立接入或完全自定义面板。
+
+本期所有已登记模块默认启用；不提供后台启停、在线安装卸载或 API/队列停用。
+
+迁移文件统一维护在 `database/migrations`，由服务提供者自动加载，也通过 `qrcode-migrations` 标签发布。

@@ -14,6 +14,10 @@ use Overtrue\LaravelWeChat\EasyWeChat;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 use EasyWeChat\MiniApp\Application;
+use Fayne\CMS\Support\Authorization\PermissionRegistry;
+use Fayne\CMS\Support\Modules\ModuleRegistry;
+use Fayne\QrCode\Console\InstallCommand;
+use Fayne\QrCode\Filament\QrcodePlugin;
 
 class QrcodeServiceProvider extends PackageServiceProvider
 {
@@ -21,12 +25,15 @@ class QrcodeServiceProvider extends PackageServiceProvider
     {
         $package->name('qrcode')
             ->hasConfigFile()
-            ->hasCommand(\Fayne\QrCode\Console\InstallCommand::class);
+            ->hasCommand(InstallCommand::class);
     }
 
     public function packageRegistered(): void
     {
-        $this->callAfterResolving(\Fayne\CMS\Support\Authorization\PermissionRegistry::class, function ($registry): void {
+        $this->callAfterResolving(ModuleRegistry::class, function ($registry): void {
+            $registry->register('qrcode', 'Qrcode', QrcodePlugin::class);
+        });
+        $this->callAfterResolving(PermissionRegistry::class, function ($registry): void {
             $registry->register('qrcode', require __DIR__ . '/../resources/permissions.php');
         });
         config(['easywechat.mini_app.default' => array_replace([
@@ -40,8 +47,9 @@ class QrcodeServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
+        $this->publishes([__DIR__ . '/../config/qrcode.php' => config_path('qrcode.php')], 'cms-module-assets');
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-        $this->publishes([__DIR__ . '/../database/migrations' => database_path('migrations')], 'qrcode-migrations');
+        $this->publishes([__DIR__ . '/../database/migrations' => database_path('migrations')], ['qrcode-migrations', 'cms-module-assets']);
         $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'filament-qrcode');
         if (! $this->app->bound('easywechat.mini_app.default')) {
             $this->app->singleton('easywechat.mini_app.default', function ($app) {

@@ -19,17 +19,8 @@ final class InstallCommand extends Command
             return self::FAILURE;
         }
 
-        $status = $this->call('vendor:publish', ['--tag' => 'qrcode-migrations', '--no-interaction' => true]);
-        if ($status !== self::SUCCESS) {
-            return $status;
-        }
-
-        $status = $this->call('migrate', ['--force' => true]);
-        if ($status !== self::SUCCESS) {
-            return $status;
-        }
-        if (! is_file(config_path('qrcode.php'))) {
-            $status = $this->call('vendor:publish', ['--tag' => 'qrcode-config']);
+        if (! (app()->bound(\Fayne\CMS\Support\InstallationContext::class) && app(\Fayne\CMS\Support\InstallationContext::class)->prepared)) {
+            $status = $this->call('vendor:publish', ['--tag' => ['qrcode-config', 'qrcode-migrations'], '--no-interaction' => true]);
             if ($status !== self::SUCCESS) {
                 return $status;
             }
@@ -37,6 +28,10 @@ final class InstallCommand extends Command
                 $this->error('QR code configuration could not be published.');
 
                 return self::FAILURE;
+            }
+            $status = $this->call('migrate', ['--force' => true]);
+            if ($status !== self::SUCCESS) {
+                return $status;
             }
         }
 

@@ -121,3 +121,16 @@ This package uses a [proprietary license](../LICENSE.md). Use, copying and redis
 `php artisan cms:qrcode:install` runs registered migrations, publishes `qrcode.php` only when missing, and initializes this module's permission definitions when permission tables are available. CMS Core uses tenant-prefixed keys; standalone permission hosts use the original names. Repeated runs preserve configuration and existing role grants. The command does not generate images, demo records or credentials, or automatically register the panel plugin.
 
 Use `php artisan cms:qrcode:install --force --no-interaction` for production deployments. Migration/publication failure stops installation; unavailable permission tables produce a host-authorization warning. The command does not recursively invoke `cms:install`. Refresh cached configuration through your deployment workflow and configure storage, WeChat credentials and administrator permissions explicitly.
+
+
+When orchestrated by `cms:install`, installed modules publish their configuration and migrations before the first migration pass. The shared installer then migrates and seeds permissions once, creates accounts/tenants, and generates demo content. Nested module commands reuse the prepared infrastructure instead of publishing or migrating again. Running a module install command independently still performs its complete setup. Preparation state is confined to the command run and restored on success or failure.
+
+## Automatic CMS module registration
+
+With CMS Core installed, this package registers its module through its Laravel ServiceProvider. Panels extending `Fayne\CMS\Providers\AdminPanelProvider` / `TenantPanelProvider` automatically connect installed modules: business UI belongs to the ordinary panel in single-site mode and the workspace in multi-tenant mode. Installation grants no account permissions; policies still control navigation and access.
+
+In a fully custom PanelProvider, configure explicit plugins first, then return `app(\Fayne\CMS\Support\Modules\ModuleRegistry::class)->applyTo($panel)`. An explicitly configured plugin with the same ID is preserved. Do not register the same business plugin again after applying the registry. Earlier manual Plugin examples remain applicable to standalone or fully custom panels.
+
+Registered modules are enabled by default in this phase. There is no module-management UI, online installation/removal or runtime API/queue disabling. 
+
+Migration files are maintained exclusively in `database/migrations`. The service provider loads them automatically and publishes them with the `qrcode-migrations` tag.
